@@ -12,3 +12,10 @@ The game should first launch into a menu consisting of a series of buttons
     
 - Quit Game 
   - This option quits the program thus exiting the game
+ 
+## Combat system
+// Tadas ideacrafting begins
+Your character is extremely lucky and kills all their foes with luck. The character can randomly enflame his enemies during combat.
+
+// Tadas ideacrafting ends
+// Actual game ideas
