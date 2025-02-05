@@ -1,4 +1,3 @@
-## A text adventure game created in Java!
+## Text Adventure Game Created in Java!
 
 
-git status
