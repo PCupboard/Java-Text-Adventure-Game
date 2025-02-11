@@ -1,6 +1,6 @@
 package model;
 
-public class Weapon {
+public class Weapon extends Item {
     private int id;
     private String name;
     private int rarity;
