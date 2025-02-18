@@ -1,6 +1,5 @@
 package model.entities;
-import model.Weapon;
-import java.util.ArrayList;
+import model.items.Weapon;
 
 public abstract class Character {
     private int id;
