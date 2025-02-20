@@ -3,10 +3,10 @@ package util;
 public abstract class Settings {
 
     public static void clearScreen() {
-        System.out.println(MOVE_CARET_TO_TOP); System.out.flush();
+        System.out.println("\033[H\033[2J");
+        System.out.flush();
     }
 
-    public static final String MOVE_CARET_TO_TOP = "\033[H\033[2J";
     public static final String TEXT_RESET = "\u001B[0m";
     public static final String TEXT_UNDERLINE = "\u001B[4m";
     public static final String TEXT_BOLD = "\u001B[1m";

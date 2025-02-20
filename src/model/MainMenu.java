@@ -1,4 +1,4 @@
 package model;
 
-public class MainMenu {
+public abstract class MainMenu {
 }

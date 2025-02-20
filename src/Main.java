@@ -1,3 +1,4 @@
+import model.Combat;
 import model.entities.Enemy;
 import model.entities.Player;
 import model.items.Item;
@@ -5,13 +6,14 @@ import model.items.Rarity;
 import model.items.Weapon;
 import util.Settings;
 
+import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("ifirjfienfmfjdm");
-        System.out.print(Settings.MOVE_CARET_TO_TOP);
-        System.out.flush();
+        Settings.clearScreen();
         System.out.println("The screen was flushed!");
         // Leker med å cleare terminalen for tekst
 
@@ -37,16 +39,27 @@ public class Main {
         System.out.println("player start health: "+player.getHealth()+"\n"+"player weapon damage: "+player.getCurrentWeapon().getDamage()+"\n");
         System.out.println("enemy start health: "+enemy.getHealth()+"\n"+"enemy weapon damage: "+enemy.getCurrentWeapon().getDamage());
 
-        System.out.println(Settings.MOVE_CARET_TO_TOP);
-        System.out.flush();
+        Settings.clearScreen();
 
         player.combat(enemy);
         player.combat(enemy);
         System.out.println("Player health: "+player.getHealth());
         System.out.println("Enemy health: "+enemy.getHealth());
 
+        Combat.playerCombat(player, enemy);
+
+        // Everything below here is supposed to be in the final game
+
+        Scanner user_scanner = new Scanner(System.in);
+
         // Game loop
         while (true) {
+            /*
+            Game launches into main menu. Player starts game. Player chooses name.
+            After player chooses name, gets launched into the starting area.
+            Game will only have the starting area on launch.
+
+             */
             break;
         }
     }

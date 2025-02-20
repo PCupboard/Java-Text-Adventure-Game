@@ -10,6 +10,9 @@ public abstract class Stats {
     private int Wisdom = 10;
     private HashMap<String, Integer> stats = new HashMap<String, Integer>();
 
+    // Må differensiere mellom max*enter stat here* og current*enter stat here* (f.eks maxHealth og currentHealth)
+    // Gjør i morgen!
+
     public Stats() {
 
 
@@ -17,6 +20,10 @@ public abstract class Stats {
 
     public int getHealth() {
         return Health;
+    }
+    public void printHealth() {
+        StringBuilder healthBar = new StringBuilder();
+        // The health bar will give
     }
     public void addHealth(int health) {
         Health += health;

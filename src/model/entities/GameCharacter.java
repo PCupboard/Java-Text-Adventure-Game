@@ -1,7 +1,7 @@
 package model.entities;
 import model.items.Weapon;
 
-public abstract class Character extends Stats {
+public abstract class GameCharacter extends Stats {
     //private int id;
     protected String name;
     protected String description;
@@ -29,7 +29,7 @@ public abstract class Character extends Stats {
     The storage would need to store weapons and different types of items (potions, keys, etc)
      */
 
-    public Character(String name, String description, Weapon currentWeapon) {
+    public GameCharacter(String name, String description, Weapon currentWeapon) {
         //id++;
         this.name = name;
         this.description = description;
@@ -37,7 +37,7 @@ public abstract class Character extends Stats {
 
     }
 
-    public void combat(Character enemy) {
+    public void combat(GameCharacter enemy) {
         enemy.removeHealth(currentWeapon.getDamage());
         removeHealth(enemy.currentWeapon.getDamage());
     }
