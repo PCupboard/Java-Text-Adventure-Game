@@ -4,8 +4,8 @@ import model.items.Weapon;
 
 public class NonPlayableCharacter extends Character {
 
-    public NonPlayableCharacter(String name, Weapon currentWeapon) {
-        super(name, currentWeapon);
+    public NonPlayableCharacter(String name, String description, Weapon currentWeapon) {
+        super(name, description, currentWeapon);
     }
 
 }

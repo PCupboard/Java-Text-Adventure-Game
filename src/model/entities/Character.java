@@ -2,8 +2,9 @@ package model.entities;
 import model.items.Weapon;
 
 public abstract class Character extends Stats {
-    private int id;
+    //private int id;
     protected String name;
+    protected String description;
     protected Weapon currentWeapon;
     /*
     The Weapon class holds damage values for each weapon, weapon creation will probably be done from a JSON file,
@@ -28,19 +29,37 @@ public abstract class Character extends Stats {
     The storage would need to store weapons and different types of items (potions, keys, etc)
      */
 
-    public Character(String name, Weapon currentWeapon) {
-        id++;
+    public Character(String name, String description, Weapon currentWeapon) {
+        //id++;
         this.name = name;
+        this.description = description;
         this.currentWeapon = currentWeapon;
 
     }
 
-    public void combat() {
-
+    public void combat(Character enemy) {
+        enemy.removeHealth(currentWeapon.getDamage());
+        removeHealth(enemy.currentWeapon.getDamage());
     }
 
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-
-
+    public Weapon getCurrentWeapon() {
+        return currentWeapon;
+    }
+    public void setCurrentWeapon(Weapon currentWeapon) {
+        this.currentWeapon = currentWeapon;
+    }
 }

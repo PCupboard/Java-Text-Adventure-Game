@@ -18,8 +18,11 @@ public abstract class Stats {
     public int getHealth() {
         return Health;
     }
-    public void addHealth(int Health) {
-        this.Health += Health;
+    public void addHealth(int health) {
+        Health += health;
+    }
+    public void removeHealth(int health) {
+        Health -= health;
     }
 
     public int getConstitution() {
@@ -28,6 +31,9 @@ public abstract class Stats {
     public void addConstitution(int constitution) {
         Constitution += constitution;
     }
+    public void removeConstitution( int constitution) {
+        Constitution -= constitution;
+    }
 
     public int getAgility() {
         return Agility;
@@ -35,11 +41,17 @@ public abstract class Stats {
     public void addAgility(int agility) {
         Agility += agility;
     }
+    public void removeAgility(int agility) {
+        Agility -= agility;
+    }
 
     public int getWisdom() {
         return Wisdom;
     }
     public void addWisdom(int wisdom) {
         Wisdom += wisdom;
+    }
+    public void removeWisdom(int wisdom) {
+        Wisdom -= wisdom;
     }
 }
