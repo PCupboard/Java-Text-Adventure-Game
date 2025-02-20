@@ -1,11 +1,10 @@
 package model.entities;
 import model.items.Weapon;
 
-public abstract class Character {
+public abstract class Character extends Stats {
     private int id;
-    private String name;
-    private int health;
-    private Weapon currentWeapon;
+    protected String name;
+    protected Weapon currentWeapon;
     /*
     The Weapon class holds damage values for each weapon, weapon creation will probably be done from a JSON file,
     that gets loaded whenever you acquire a new weapon, game needs weapon rarities perhaps?
@@ -26,9 +25,19 @@ public abstract class Character {
     The easiest way to achieve that would be some form of turn based combat.
     Just for making sure i can more easily expand upon the game later, the Storage will stay in the Character class.
 
-    The storage would need to store weapons and different types of items (potions, keys etc)
+    The storage would need to store weapons and different types of items (potions, keys, etc)
      */
 
+    public Character(String name, Weapon currentWeapon) {
+        id++;
+        this.name = name;
+        this.currentWeapon = currentWeapon;
+
+    }
+
+    public void combat() {
+
+    }
 
 
 

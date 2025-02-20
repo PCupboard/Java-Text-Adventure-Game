@@ -1,5 +1,7 @@
 package model.items;
 
+import util.Settings;
+
 public class Item {
     /*
     Thought of as a general class for all items.
@@ -8,15 +10,15 @@ public class Item {
     private int id = 0;
     protected String name;
     protected String description;
-    protected int value;
-    protected Rarity rarity;
+    protected int sellValue;
+    protected String rarity;
 
     // Constructors
-    public Item(String name, String description, Rarity rarity, int value) {
+    public Item(String name, String description, int sellValue, String rarity) {
         id++;
         this.name = name;
         this.description = description;
-        this.value = value;
+        this.sellValue = sellValue;
         this.rarity = rarity;
     }
 
@@ -38,10 +40,16 @@ public class Item {
         this.description = description;
     }
 
-    public int getValue() {
-        return value;
+    public int getSellValue() {
+        return sellValue;
     }
-    public void setValue(int value) {
-        this.value = value;
+
+    public String getRarity() {
+        return rarity;
+    }
+
+    @Override
+    public String toString() {
+        return rarity+" "+name+Settings.TEXT_RESET+"\n"+description;
     }
 }

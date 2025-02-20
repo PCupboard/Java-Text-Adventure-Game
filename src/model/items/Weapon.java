@@ -2,19 +2,19 @@ package model.items;
 
 public class Weapon extends Item {
     private int damage;
-    private final boolean two_handed;
+    private final boolean twoHanded;
 
-    public Weapon(String name, String description, Rarity rarity, int value, int damage, boolean two_handed) {
-        super(name, description, rarity, value);
+    public Weapon(String name, String description, int sellValue, String rarity, int damage, boolean twoHanded) {
+        super(name, description, sellValue, rarity);
         this.damage = damage;
-        this.two_handed = two_handed;
+        this.twoHanded = twoHanded;
     }
 
     public int getDamage() {
         return damage;
     }
 
-    public boolean isTwo_handed() {
-        return two_handed;
+    public boolean getTwoHanded() {
+        return twoHanded;
     }
 }
