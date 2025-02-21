@@ -38,8 +38,8 @@ public abstract class GameCharacter extends Stats {
     }
 
     public void combat(GameCharacter enemy) {
-        enemy.removeHealth(currentWeapon.getDamage());
-        removeHealth(enemy.currentWeapon.getDamage());
+        enemy.removeCurrentHealth(currentWeapon.getDamage());
+        removeCurrentHealth(enemy.currentWeapon.getDamage());
     }
 
     public String getName() {

@@ -1,10 +1,10 @@
 package util;
+import java.io.IOException;
 
 public abstract class Settings {
 
-    public static void clearScreen() {
-        System.out.println("\033[H\033[2J");
-        System.out.flush();
+    public static void clearScreen(String... arg) throws IOException, InterruptedException {
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
     }
 
     public static final String TEXT_RESET = "\u001B[0m";

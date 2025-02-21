@@ -6,9 +6,7 @@ import model.items.Rarity;
 import model.items.Weapon;
 import util.Settings;
 
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -35,22 +33,30 @@ public class Main {
         Enemy enemy = new Enemy("Goblin", "A common enemy found all throughout the world", fist);
         System.out.println();
 
-        player.addHealth(20);
-        System.out.println("player start health: "+player.getHealth()+"\n"+"player weapon damage: "+player.getCurrentWeapon().getDamage()+"\n");
-        System.out.println("enemy start health: "+enemy.getHealth()+"\n"+"enemy weapon damage: "+enemy.getCurrentWeapon().getDamage());
+        //player.addMaxHealth(20);
+        System.out.println("player start health: "+player.getMaxHealth()+"\n"+"player weapon damage: "+player.getCurrentWeapon().getDamage()+"\n");
+        System.out.println("enemy start health: "+enemy.getMaxHealth()+"\n"+"enemy weapon damage: "+enemy.getCurrentWeapon().getDamage());
 
         Settings.clearScreen();
 
-        player.combat(enemy);
-        player.combat(enemy);
-        System.out.println("Player health: "+player.getHealth());
-        System.out.println("Enemy health: "+enemy.getHealth());
-
         Combat.playerCombat(player, enemy);
+
+        //player.addCurrentHealth(80);
+
+        player.combat(enemy);
+        player.combat(enemy);
+        player.combat(enemy);
+        System.out.println();
+        System.out.println(player.getCurrentHealth());
+        System.out.println(enemy.getCurrentHealth());
+
+        player.printHealth();
+        System.out.println();
 
         // Everything below here is supposed to be in the final game
 
         Scanner user_scanner = new Scanner(System.in);
+        user_scanner.next();
 
         // Game loop
         while (true) {
