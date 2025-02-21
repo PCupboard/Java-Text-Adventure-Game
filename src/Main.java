@@ -1,5 +1,6 @@
 import model.Combat;
 import model.entities.Enemy;
+import model.entities.NonPlayableCharacter;
 import model.entities.Player;
 import model.items.Item;
 import model.items.Rarity;
@@ -26,9 +27,10 @@ public class Main {
         Item potion = new Item("Healing Potion", "A healing potion crafted by the gods themselves", 1, Rarity.LEGENDARY);
         System.out.println(potion);
 
-        Weapon fist = new Weapon("Empty", "You have nothing currently equipped!", 0, Rarity.COMMON, 5, true);
+        Weapon fist = new Weapon("Nothing", "You have nothing currently equipped!", 0, "", 5, true);
 
         Player player = new Player("Tadas", "The player character!", fist);
+        NonPlayableCharacter npc1 = new NonPlayableCharacter("John", "An adventurer who set out after losing his hometown", fist);
 
         Enemy enemy = new Enemy("Goblin", "A common enemy found all throughout the world", fist);
         System.out.println();
@@ -39,7 +41,9 @@ public class Main {
 
         Settings.clearScreen();
 
-        Combat.playerCombat(player, enemy);
+        enemy.removeCurrentHealth(100);
+
+        Combat.start(player, enemy, npc1);
 
         //player.addCurrentHealth(80);
 

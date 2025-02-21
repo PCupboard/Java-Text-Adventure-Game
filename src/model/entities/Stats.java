@@ -1,5 +1,7 @@
 package model.entities;
 
+import util.Settings;
+
 public abstract class Stats {
     private int maxHealth = 100;
     private int currentHealth = maxHealth;
@@ -28,26 +30,32 @@ public abstract class Stats {
         maxHealth -= MaxHealth;
     }
 
-    public int getCurrentHealth() { return currentHealth; }
-    public void addCurrentHealth(int CurrentHealth) {currentHealth += CurrentHealth; }
-    public void removeCurrentHealth(int CurrentHealth) {currentHealth -= CurrentHealth; }
+    public int getCurrentHealth() {
+        return currentHealth;
+    }
+    public void addCurrentHealth(int CurrentHealth) {
+        currentHealth += CurrentHealth;
+    }
+    public void removeCurrentHealth(int CurrentHealth) {
+        currentHealth -= CurrentHealth;
+    }
 
-    public void printHealth() {
+    public String printHealth() {
         StringBuilder healthBar = new StringBuilder();
-        healthBar.append("|");
+        healthBar.append("│");
         int maxHealthForBar = maxHealth / 10;
         int currentHealthForBar = currentHealth / 10;
 
-        System.out.println("Current health bar: "+currentHealthForBar);
-        System.out.println("Max health bar: "+maxHealthForBar);
+        //System.out.println("Current health bar: "+currentHealthForBar);
+        //System.out.println("Max health bar: "+maxHealthForBar);
         for (int i = 1; i <= currentHealthForBar; i++) {
-            healthBar.append("#");
+            healthBar.append("\u001B[42m" + " " + Settings.TEXT_RESET);
         }
         for (int i = 1; i <= (maxHealthForBar - currentHealthForBar); i++) {
-            healthBar.append("-");
+            healthBar.append("\u001B[41m" + " " + Settings.TEXT_RESET);
         }
-        healthBar.append("|");
-        System.out.println(healthBar);
+        healthBar.append("│");
+        return healthBar.toString();
 
     }
 

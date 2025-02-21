@@ -14,6 +14,15 @@ public class Weapon extends Item {
         return damage;
     }
 
+    public String getNameWithRarity() {
+        if (rarity.isBlank()) {
+            return name;
+        }
+        else {
+            return rarity+" "+name;
+        }
+    }
+
     public boolean getTwoHanded() {
         return twoHanded;
     }
