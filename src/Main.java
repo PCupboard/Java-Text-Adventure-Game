@@ -33,41 +33,32 @@ public class Main {
         NonPlayableCharacter npc1 = new NonPlayableCharacter("John", "An adventurer who set out after losing his hometown", fist);
 
         Enemy enemy = new Enemy("Goblin", "A common enemy found all throughout the world", fist);
+        Enemy enemy01 = new Enemy("Goblin", "A common enemy found all throughout the world", fist);
         System.out.println();
 
-        //player.addMaxHealth(20);
         System.out.println("player start health: "+player.getMaxHealth()+"\n"+"player weapon damage: "+player.getCurrentWeapon().getDamage()+"\n");
         System.out.println("enemy start health: "+enemy.getMaxHealth()+"\n"+"enemy weapon damage: "+enemy.getCurrentWeapon().getDamage());
 
         Settings.clearScreen();
 
-        enemy.removeCurrentHealth(100);
+        enemy.removeCurrentHealth(80);
 
-        Combat.start(player, enemy, npc1);
-
-        //player.addCurrentHealth(80);
-
-        player.combat(enemy);
-        player.combat(enemy);
-        player.combat(enemy);
-        System.out.println();
-        System.out.println(player.getCurrentHealth());
-        System.out.println(enemy.getCurrentHealth());
-
-        player.printHealth();
-        System.out.println();
-
-        // Everything below here is supposed to be in the final game
+        Combat.start(player, enemy, npc1, enemy01);
 
         Scanner user_scanner = new Scanner(System.in);
         user_scanner.next();
 
+
+        // Everything below here is supposed to be in the final game
+
+
         // Game loop
         while (true) {
+            Settings.clearScreen();
             /*
             Game launches into main menu. Player starts game. Player chooses name.
             After player chooses name, gets launched into the starting area.
-            Game will only have the starting area on launch.
+            Game will only have the starting area on launch. :D
 
              */
             break;

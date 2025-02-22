@@ -15,11 +15,6 @@ public abstract class Stats {
     private int maxWisdom = 10;
     private int currentWisdom = maxWisdom;
 
-    //private HashMap<String, Integer> stats = new HashMap<String, Integer>();
-
-    // Må differensiere mellom max*enter stat here* og current*enter stat here* (f.eks maxHealth og currentHealth)
-    // Gjør i morgen!
-
     public int getMaxHealth() {
         return maxHealth;
     }
@@ -38,6 +33,18 @@ public abstract class Stats {
     }
     public void removeCurrentHealth(int CurrentHealth) {
         currentHealth -= CurrentHealth;
+        if (isCharacterDead()) {
+            System.out.println("Character has died!");
+        }
+
+    }
+    private boolean isCharacterDead() {
+        if (getCurrentHealth() <= 0) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     public String printHealth() {
@@ -46,8 +53,6 @@ public abstract class Stats {
         int maxHealthForBar = maxHealth / 10;
         int currentHealthForBar = currentHealth / 10;
 
-        //System.out.println("Current health bar: "+currentHealthForBar);
-        //System.out.println("Max health bar: "+maxHealthForBar);
         for (int i = 1; i <= currentHealthForBar; i++) {
             healthBar.append("\u001B[42m" + " " + Settings.TEXT_RESET);
         }
@@ -62,6 +67,7 @@ public abstract class Stats {
     public int getMaxConstitution() {
         return maxConstitution;
     }
+    public int getCurrentConstitution() { return currentConstitution; }
     public void addMaxConstitution(int MaxConstitution) {
         maxConstitution += MaxConstitution;
     }
@@ -72,6 +78,7 @@ public abstract class Stats {
     public int getMaxAgility() {
         return maxAgility;
     }
+    public int getCurrentAgility() { return currentAgility; }
     public void addMaxAgility(int MaxAgility) {
         maxAgility += MaxAgility;
     }
@@ -82,6 +89,7 @@ public abstract class Stats {
     public int getMaxWisdom() {
         return maxWisdom;
     }
+    public int getCurrentWisdom() { return currentWisdom; }
     public void addMaxWisdom(int MaxWisdom) {
         maxWisdom += MaxWisdom;
     }

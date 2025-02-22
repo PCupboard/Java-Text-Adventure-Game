@@ -9,15 +9,24 @@ import util.Settings;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Random;
 import java.util.Scanner;
 
 public abstract class Combat {
+    // Variables which need to be saved on exit from game (a.k.a need getters)
     private static int numBattles = 0;
 
+    // Variables which need to be zeroed/cleared after each combat is done
+    static boolean viewEnemyDetails = false;
     private static ArrayList<GameCharacter> gameCharacterPlayers = new ArrayList<>();
     private static ArrayList<GameCharacter> gameCharacterEnemies = new ArrayList<>();
+    private static ArrayList<GameCharacter> deadGameCharacterPlayers = new ArrayList<>();
+    private static ArrayList<GameCharacter> deadGameCharacterEnemies = new ArrayList<>();
 
-    // 1v1 method
+    static Random random = new Random();
+
+    // Combat method
     public static void start(GameCharacter @NotNull... characters) throws IOException, InterruptedException {
         numBattles++;
 
@@ -29,6 +38,43 @@ public abstract class Combat {
                 gameCharacterEnemies.add(character);
             }
         }
+
+        commenceCombatPrint();
+
+        // Battle logic here
+        while (true) {
+
+            // Calculate health of each side. See if all characters on one side are completely dead.
+            // If all are dead on one side, end battle.
+            if (isOneSideDead()) {
+                break;
+            }
+
+            if (calculatingMaxAgility()) {
+                for (GameCharacter ally : gameCharacterPlayers) {
+                    playerTurn(ally);
+                }
+                for (GameCharacter enemy : gameCharacterEnemies) {
+                    enemyTurn(enemy);
+                }
+            }
+
+            else {
+                for (GameCharacter enemy : gameCharacterEnemies) {
+                    enemyTurn(enemy);
+                }
+                for (GameCharacter ally : gameCharacterPlayers) {
+                    playerTurn(ally);
+                }
+            }
+        }
+
+        restartBattleVariables();
+
+    }
+
+    // 2v2 method
+    private static void commenceCombatPrint() throws InterruptedException {
 
         Thread.sleep(500);
         System.out.print("A battle between ");
@@ -49,81 +95,147 @@ public abstract class Combat {
         Thread.sleep(500);
         System.out.print(".");
         Thread.sleep(500);
+
+    }
+
+    private static void printCombatDetails() throws IOException, InterruptedException {
         Settings.clearScreen();
+        System.out.println(Settings.BLUE+"ALLIES"+Settings.TEXT_RESET);
+        for (GameCharacter player : gameCharacterPlayers) {
+            System.out.println(player.getName() + " " + player.printHealth() + " " +
+                    player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
+        }
 
-        // Battle logic here
+        // Need to redo the code for this once i add storage for enemies, need to show how many potions they have.
+        int numEnemy = 1;
+        System.out.println(Settings.RED+"ENEMIES"+Settings.TEXT_RESET);
+        for (GameCharacter enemy : gameCharacterEnemies) {
+            System.out.println("┌─┐ ");
+            System.out.println("│"+numEnemy+"│ "+enemy.getName() + " " + enemy.printHealth() + " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
+            if (viewEnemyDetails) {
+                System.out.print("└─┘ ");
+                System.out.println("Equipped weapon: " + enemy.getCurrentWeapon().getNameWithRarity() + " | " + enemy.getCurrentWeapon().getDamage() + " damage");
+            } else {
+                System.out.println("└─┘ ");
+            }
+            numEnemy++;
+        }
+        viewEnemyDetails = false;
+
+        for (int i = 0; i < 40; i++) {
+            System.out.print("─");
+        }
+        System.out.println();
+
+    }
+
+    private static boolean calculatingMaxAgility() {
+        int maxAgilityAllies = 0;
+        int maxAgilityEnemies = 0;
+
+        for (GameCharacter character : gameCharacterPlayers) {
+            maxAgilityAllies += character.getCurrentAgility();
+        }
+        for (GameCharacter character : gameCharacterEnemies) {
+            maxAgilityEnemies += character.getCurrentAgility();
+        }
+        if (maxAgilityAllies >= maxAgilityEnemies) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isOneSideDead() {
+        for (GameCharacter ally : gameCharacterPlayers) {
+            if (ally.getCharacterDeadStatus()) {
+                deadGameCharacterPlayers.add(ally);
+            }
+        }
+        gameCharacterPlayers.removeAll(deadGameCharacterPlayers);
+
+        if (gameCharacterPlayers.isEmpty()) {
+            return true;
+        }
+
+        for (GameCharacter enemy : gameCharacterEnemies) {
+            if (enemy.getCharacterDeadStatus()) {
+                deadGameCharacterEnemies.add(enemy);
+            }
+        }
+        gameCharacterEnemies.removeAll((deadGameCharacterEnemies));
+
+        return gameCharacterEnemies.isEmpty();
+    }
+
+    private static void playerTurn(GameCharacter ally) throws IOException, InterruptedException {
+        Scanner user_scanner = new Scanner(System.in);
         while (true) {
-            System.out.println(Settings.BLUE+"ALLIES"+Settings.TEXT_RESET);
+            printCombatDetails();
+            System.out.println("What does " + Settings.BLUE + ally.getName() + Settings.TEXT_RESET + " want to do?");
+            System.out.println("1. Attack");
+            System.out.println("2. Run away");
+            System.out.println("3. View enemy details");
 
-            for (GameCharacter player : gameCharacterPlayers) {
-                System.out.println(player.getName() +  player.printHealth() + " " +
-                        player.getCurrentHealth() + "/" + player.getMaxHealth() + " health");
-                System.out.println("Equipped weapon: " + player.getCurrentWeapon().getNameWithRarity() +
-                        " | " + player.getCurrentWeapon().getDamage() + " damage\n");
-            }
-
-            for (GameCharacter enemy : gameCharacterEnemies) {
-                System.out.println(Settings.RED+"ENEMIES"+Settings.TEXT_RESET);
-                System.out.println(enemy.getName()+ enemy.printHealth() + " " +
-                                   enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
-                System.out.println("Equipped weapon: " + enemy.getCurrentWeapon().getNameWithRarity() +
-                        " | " + enemy.getCurrentWeapon().getDamage() + " damage\n");
-            }
-
-            for (GameCharacter character : gameCharacterPlayers) {
-                System.out.println("What does "+ character.getName() +" want to do?");
-                System.out.println("1. Attack");
-                System.out.println("2. Run away");
-
-                Scanner user_scanner = new Scanner(System.in);
-                String userInput = user_scanner.next();
-
-            }
-
-            Scanner user_scanner = new Scanner(System.in);
             String userInput = user_scanner.next();
 
-            switch (userInput) {
-                case "1":
-                    playerTurnAttack(gameCharacterEnemies.toArray(new GameCharacter[0]));
-                    break;
+            if (userInput.contains("1")) {
+                boolean validInput = false;
+                do {
+                    printCombatDetails();
+                    System.out.println("Which enemy do you want to attack?");
+                    try {
+                        int userWhichEnemy = user_scanner.nextInt();
+                        userWhichEnemy -= 1;
+                        if (userWhichEnemy >= 0 && userWhichEnemy <= gameCharacterEnemies.size()) {
+                            validInput = true;
+                            ally.attackCharacter(gameCharacterEnemies.get(userWhichEnemy));
+                        }
+                        else {
+                            System.out.println("This isn't the number of any enemies!");
+                            Thread.sleep(500);
+                        }
 
-                case "2":
-                    System.out.println("You chose to run away!");
+                    } catch (Exception InputMismatchException) {
+                        System.out.print("Input unrecognized! Enter the number of the enemy!");
+                        Thread.sleep(500);
+                        System.out.print("\\33[2K");
+                        user_scanner.nextLine();
 
-                default:
-                    System.out.println("Unrecognized input :(");
+                    }
+
+                }
+                while (!validInput);
+
+                break;
+            }
+            else if (userInput.contains("2")) {
+                System.out.println("You chose to run away!");
+                break;
+            }
+            else if (userInput.contains("3")) {
+                viewEnemyDetails = true;
+            }
+            else {
+                System.out.println("Unrecognized input, Try again!");
+                Thread.sleep(500);
             }
         }
     }
 
-
-    // 1v2 method
-    public static void playerCombat(GameCharacter @NotNull ... characters) {
-        numBattles++;
-
-        for (GameCharacter character : characters) {
-            if (character instanceof Player) {
-                gameCharacterPlayers.add(character);
-            }
-            else if (character instanceof Enemy) {
-                gameCharacterEnemies.add(character);
-            }
-        }
+    private static void enemyTurn(GameCharacter enemy) throws IOException, InterruptedException {
+        printCombatDetails();
+        int targetRandomInt = random.nextInt(gameCharacterPlayers.size());
+        GameCharacter targetToAttack = gameCharacterPlayers.get(targetRandomInt);
+        enemy.attackCharacter(targetToAttack);
     }
 
-    // 2v2 method
-    public static void playerCombat(GameCharacter firstPlayer, GameCharacter secondPlayer,
-                                    GameCharacter firstEnemy,  GameCharacter secondEnemy) {
-        numBattles++;
-    }
+    private static void restartBattleVariables() {
+        gameCharacterPlayers.clear();
+        gameCharacterEnemies.clear();
 
-    private static void playerTurnAttack(GameCharacter... character) {
-
-    }
-
-
-    private static void enemyTurn() {
+        deadGameCharacterEnemies.clear();
+        deadGameCharacterPlayers.clear();
 
     }
 
