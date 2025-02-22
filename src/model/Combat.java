@@ -8,10 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import util.Settings;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class Combat {
     // Variables which need to be saved on exit from game (a.k.a need getters)
@@ -19,8 +16,16 @@ public abstract class Combat {
 
     // Variables which need to be zeroed/cleared after each combat is done
     static boolean viewEnemyDetails = false;
+
+    private static ArrayList<GameCharacter> firstTurn;
+    private static ArrayList<GameCharacter> secondTurn;
+
     private static ArrayList<GameCharacter> gameCharacterPlayers = new ArrayList<>();
     private static ArrayList<GameCharacter> gameCharacterEnemies = new ArrayList<>();
+
+    private static ArrayList<GameCharacter> aliveGameCharactersPlayers;
+    private static ArrayList<GameCharacter> aliveGameCharactersEnemies;
+
     private static ArrayList<GameCharacter> deadGameCharacterPlayers = new ArrayList<>();
     private static ArrayList<GameCharacter> deadGameCharacterEnemies = new ArrayList<>();
 
@@ -39,37 +44,39 @@ public abstract class Combat {
             }
         }
 
+        aliveGameCharactersPlayers = new ArrayList<>(gameCharacterPlayers);
+        aliveGameCharactersEnemies = new ArrayList<>(gameCharacterEnemies);
+
         commenceCombatPrint();
 
-        // Battle logic here
+        // Battle logic starts here
         while (true) {
 
             // Calculate health of each side. See if all characters on one side are completely dead.
             // If all are dead on one side, end battle.
-            if (isOneSideDead()) {
-                break;
-            }
 
-            if (calculatingMaxAgility()) {
-                for (GameCharacter ally : gameCharacterPlayers) {
-                    playerTurn(ally);
-                }
-                for (GameCharacter enemy : gameCharacterEnemies) {
-                    enemyTurn(enemy);
-                }
-            }
+            calculateTurnOrder();
 
-            else {
-                for (GameCharacter enemy : gameCharacterEnemies) {
-                    enemyTurn(enemy);
+            for (GameCharacter character : firstTurn) {
+                if (firstTurn == gameCharacterPlayers) {
+                    playerTurn(character);
+                } else {
+                    enemyTurn(character);
                 }
-                for (GameCharacter ally : gameCharacterPlayers) {
-                    playerTurn(ally);
+                removeDeadCharacters();
+
+            }
+            for (GameCharacter character : secondTurn) {
+                if (secondTurn == gameCharacterPlayers) {
+                    playerTurn(character);
+                } else {
+                    enemyTurn(character);
                 }
+                removeDeadCharacters();
             }
         }
 
-        restartBattleVariables();
+        //restartBattleVariables();
 
     }
 
@@ -102,6 +109,10 @@ public abstract class Combat {
         Settings.clearScreen();
         System.out.println(Settings.BLUE+"ALLIES"+Settings.TEXT_RESET);
         for (GameCharacter player : gameCharacterPlayers) {
+            if (player.getCharacterDeadStatus()) {
+                System.out.println(player.getName() + Settings.RED+" DEAD "+Settings.TEXT_RESET+
+                        player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
+            }
             System.out.println(player.getName() + " " + player.printHealth() + " " +
                     player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
         }
@@ -129,7 +140,7 @@ public abstract class Combat {
 
     }
 
-    private static boolean calculatingMaxAgility() {
+    private static void calculateTurnOrder() {
         int maxAgilityAllies = 0;
         int maxAgilityEnemies = 0;
 
@@ -140,39 +151,34 @@ public abstract class Combat {
             maxAgilityEnemies += character.getCurrentAgility();
         }
         if (maxAgilityAllies >= maxAgilityEnemies) {
-            return true;
+            firstTurn = gameCharacterPlayers;
+            secondTurn = gameCharacterEnemies;
         } else {
-            return false;
+            firstTurn = gameCharacterEnemies;
+            secondTurn = gameCharacterPlayers;
         }
     }
 
-    private static boolean isOneSideDead() {
+    private static void removeDeadCharacters() {
         for (GameCharacter ally : gameCharacterPlayers) {
             if (ally.getCharacterDeadStatus()) {
-                deadGameCharacterPlayers.add(ally);
+                aliveGameCharactersPlayers.remove(ally);
             }
-        }
-        gameCharacterPlayers.removeAll(deadGameCharacterPlayers);
-
-        if (gameCharacterPlayers.isEmpty()) {
-            return true;
         }
 
         for (GameCharacter enemy : gameCharacterEnemies) {
             if (enemy.getCharacterDeadStatus()) {
-                deadGameCharacterEnemies.add(enemy);
+                aliveGameCharactersEnemies.remove(enemy);
             }
         }
-        gameCharacterEnemies.removeAll((deadGameCharacterEnemies));
-
-        return gameCharacterEnemies.isEmpty();
     }
 
     private static void playerTurn(GameCharacter ally) throws IOException, InterruptedException {
+        String allyName = Settings.BLUE+ally.getName()+Settings.TEXT_RESET;
         Scanner user_scanner = new Scanner(System.in);
         while (true) {
             printCombatDetails();
-            System.out.println("What does " + Settings.BLUE + ally.getName() + Settings.TEXT_RESET + " want to do?");
+            System.out.println("What will " + allyName + " do?");
             System.out.println("1. Attack");
             System.out.println("2. Run away");
             System.out.println("3. View enemy details");
@@ -183,23 +189,27 @@ public abstract class Combat {
                 boolean validInput = false;
                 do {
                     printCombatDetails();
-                    System.out.println("Which enemy do you want to attack?");
+                    System.out.println("Which enemy does "+allyName+" want to attack?");
                     try {
                         int userWhichEnemy = user_scanner.nextInt();
                         userWhichEnemy -= 1;
                         if (userWhichEnemy >= 0 && userWhichEnemy <= gameCharacterEnemies.size()) {
                             validInput = true;
                             ally.attackCharacter(gameCharacterEnemies.get(userWhichEnemy));
+                            System.out.print("\33[2K");
+                            System.out.println(allyName+" dealt "+ally.getDamage()+
+                                                " towards the "+gameCharacterEnemies.get(userWhichEnemy).getName());
+                            Thread.sleep(500);
                         }
                         else {
-                            System.out.println("This isn't the number of any enemies!");
+                            System.out.println("This isn't the number of any enemy!");
                             Thread.sleep(500);
                         }
 
                     } catch (Exception InputMismatchException) {
-                        System.out.print("Input unrecognized! Enter the number of the enemy!");
-                        Thread.sleep(500);
-                        System.out.print("\\33[2K");
+                        System.out.print("Input unrecognized! Enter the number of any enemy!");
+                        Thread.sleep(850);
+                        System.out.print("\33[2K");
                         user_scanner.nextLine();
 
                     }
@@ -210,7 +220,7 @@ public abstract class Combat {
                 break;
             }
             else if (userInput.contains("2")) {
-                System.out.println("You chose to run away!");
+                System.out.println(allyName+" chose to run away!");
                 break;
             }
             else if (userInput.contains("3")) {
