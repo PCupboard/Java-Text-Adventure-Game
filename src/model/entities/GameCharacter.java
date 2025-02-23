@@ -2,7 +2,14 @@ package model.entities;
 import model.items.Weapon;
 import util.Settings;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
 public abstract class GameCharacter {
+
+    Random random = new Random();
+
     protected String name;
     protected String description;
     protected Weapon currentWeapon;
@@ -53,9 +60,75 @@ public abstract class GameCharacter {
 
     }
 
-    public void combat(GameCharacter enemy) {
-        enemy.removeCurrentHealth(currentWeapon.getDamage());
-        removeCurrentHealth(enemy.currentWeapon.getDamage());
+
+    public void characterCombatTurn(ArrayList<GameCharacter> gameCharacterEnemies, ArrayList<GameCharacter> gameCharacterPlayers) throws InterruptedException {
+
+        if (this instanceof Player || this instanceof NonPlayableCharacter) {
+
+            String allyName = Settings.BLUE+getName()+Settings.TEXT_RESET;
+            Scanner user_scanner = new Scanner(System.in);
+            while (true) {
+                System.out.println("What will " + allyName + " do?");
+                System.out.println("1. Attack");
+                System.out.println("2. Run away");
+                System.out.println("3. View enemy details");
+
+                String userInput = user_scanner.next();
+
+                if (userInput.contains("1")) {
+                    boolean validInput = false;
+                    do {
+                        System.out.println("Which enemy does "+allyName+" want to attack?");
+                        try {
+                            int userWhichEnemy = user_scanner.nextInt();
+                            userWhichEnemy -= 1;
+                            if (userWhichEnemy >= 0 && userWhichEnemy <= gameCharacterEnemies.size()) {
+                                validInput = true;
+                                attackCharacter(gameCharacterEnemies.get(userWhichEnemy));
+                                System.out.print("\33[2K");
+                                System.out.println(allyName+" dealt "+getDamage()+
+                                        " towards the "+gameCharacterEnemies.get(userWhichEnemy).getName());
+                                Thread.sleep(500);
+                            }
+                            else {
+                                System.out.println("This isn't the number of any enemy!");
+                                Thread.sleep(500);
+                            }
+
+                        } catch (Exception InputMismatchException) {
+                            System.out.print("Input unrecognized! Enter the number of any enemy!");
+                            Thread.sleep(850);
+                            System.out.print("\33[2K");
+                            user_scanner.nextLine();
+
+                        }
+
+                    }
+                    while (!validInput);
+
+                    break;
+                }
+                else if (userInput.contains("2")) {
+                    System.out.println(allyName+" chose to run away!");
+                    break;
+                }
+                else if (userInput.contains("3")) {
+                    //viewEnemyDetails = true;
+                }
+                else {
+                    System.out.println("Unrecognized input, Try again!");
+                    Thread.sleep(500);
+                }
+            }
+
+        }
+
+
+        else if (this instanceof Enemy){
+            int targetRandomInt = random.nextInt(gameCharacterPlayers.size());
+            GameCharacter targetToAttack = gameCharacterPlayers.get(targetRandomInt);
+            attackCharacter(targetToAttack);
+        }
     }
 
     public String getName() {
@@ -102,6 +175,7 @@ public abstract class GameCharacter {
     public int getCurrentHealth() {
         return currentHealth;
     }
+
     // Health is allowed to go into negative values.
     // Can be thought of as a "damage" value to a character's body.
     // A health of -1000 means that the body has been atomically disintegrated.
