@@ -59,8 +59,9 @@ public class Main {
             Game launches into main menu. Player starts game. Player chooses name.
             After player chooses name, gets launched into the starting area.
             Game will only have the starting area on launch. :D
-
              */
+
+
             break;
         }
     }

@@ -4,7 +4,6 @@ import model.entities.Enemy;
 import model.entities.GameCharacter;
 import model.entities.NonPlayableCharacter;
 import model.entities.Player;
-import org.jetbrains.annotations.NotNull;
 import util.Settings;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ public abstract class Combat {
     // <------------------------------------------------------------------------------------------->
 
     // Combat method
-    public static void start(GameCharacter @NotNull... characters) throws IOException, InterruptedException {
+    public static void start(GameCharacter... characters) throws IOException, InterruptedException {
         numBattles++;
 
         for (GameCharacter character : characters) {
@@ -53,10 +52,8 @@ public abstract class Combat {
                     break;
                 }
 
-                printCombatDetails();
-
                 if (!character.getIsCharacterDead()) {
-                    character.characterCombatTurn(gameCharacterEnemies, gameCharacterPlayers);
+                    character.combatTurn(gameCharacterEnemies, gameCharacterPlayers);
                 }
             }
 
@@ -70,30 +67,44 @@ public abstract class Combat {
     }
 
     private static void commenceCombatPrint() throws InterruptedException {
+        int lastIterationInt = 0;
 
         Thread.sleep(500);
         System.out.print("A battle between ");
         for (GameCharacter player : gameCharacterPlayers) {
-            System.out.print(Settings.BLUE+player.getName()+Settings.TEXT_RESET+", ");
+            if (++lastIterationInt == gameCharacterPlayers.size()) {
+                System.out.print(Settings.BLUE+player.getName()+Settings.TEXT_RESET+" ");
+            }
+            else {
+                System.out.print(Settings.BLUE+player.getName()+Settings.TEXT_RESET+", ");
+            }
         }
-        System.out.print("\u001B[38;5;172m"+" VS "+Settings.TEXT_RESET);
+
+        lastIterationInt = 0;
+
+        System.out.print("\u001B[38;5;172m"+"VS "+Settings.TEXT_RESET);
         for (GameCharacter enemy : gameCharacterEnemies) {
-            System.out.print(Settings.RED+enemy.getName()+Settings.TEXT_RESET+", ");
+            if (++lastIterationInt == gameCharacterEnemies.size()) {
+                System.out.print(Settings.RED+enemy.getName()+Settings.TEXT_RESET+" ");
+            }
+            else {
+                System.out.print(Settings.RED+enemy.getName()+Settings.TEXT_RESET+", ");
+            }
         }
-        System.out.println(" is commencing!");
+        System.out.println("is commencing!");
 
         System.out.print(".");
-        Thread.sleep(500);
+        Thread.sleep(600);
         System.out.print(".");
-        Thread.sleep(500);
+        Thread.sleep(600);
         System.out.print(".");
-        Thread.sleep(500);
+        Thread.sleep(600);
         System.out.print(".");
-        Thread.sleep(500);
+        Thread.sleep(600);
 
     }
 
-    private static void printCombatDetails() throws IOException, InterruptedException {
+    public static void printCombatDetails() throws IOException, InterruptedException {
         Settings.clearScreen();
         System.out.println(Settings.BLUE+"ALLIES"+Settings.TEXT_RESET);
         for (GameCharacter player : gameCharacterPlayers) {
@@ -101,16 +112,27 @@ public abstract class Combat {
                 System.out.println(player.getName() + Settings.RED+" DEAD "+Settings.TEXT_RESET+
                         player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
             }
-            System.out.println(player.getName() + " " + player.printHealth() + " " +
-                    player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
+            else {
+                System.out.println(player.getName() + " " + player.printHealth() + " " +
+                        player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
+            }
         }
 
         // Need to redo the code for this once i add storage for enemies, need to show how many potions they have.
         int numEnemy = 1;
         System.out.println(Settings.RED+"ENEMIES"+Settings.TEXT_RESET);
         for (GameCharacter enemy : gameCharacterEnemies) {
+
             System.out.println("┌─┐ ");
-            System.out.println("│"+numEnemy+"│ "+enemy.getName() + " " + enemy.printHealth() + " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
+            if (enemy.getIsCharacterDead()) {
+                System.out.println("│"+numEnemy+"│ "+enemy.getName() + " " + Settings.RED + "DEAD" + Settings.TEXT_RESET +
+                        " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
+            }
+            else {
+                System.out.println("│"+numEnemy+"│ "+enemy.getName() + " " + enemy.printHealth() +
+                        " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
+            }
+
             if (viewEnemyDetails) {
                 System.out.print("└─┘ ");
                 System.out.println("Equipped weapon: " + enemy.getCurrentWeapon().getNameWithRarity() + " | " + enemy.getCurrentWeapon().getDamage() + " damage");
@@ -178,6 +200,10 @@ public abstract class Combat {
 
         combatOngoing = true;
 
+    }
+
+    public static void setViewEnemyDetails(boolean viewEnemyDetails) {
+        Combat.viewEnemyDetails = viewEnemyDetails;
     }
 
     public static int getNumBattles() {

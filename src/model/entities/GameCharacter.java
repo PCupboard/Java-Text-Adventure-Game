@@ -1,7 +1,9 @@
 package model.entities;
+import model.Combat;
 import model.items.Weapon;
 import util.Settings;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -61,13 +63,13 @@ public abstract class GameCharacter {
     }
 
 
-    public void characterCombatTurn(ArrayList<GameCharacter> gameCharacterEnemies, ArrayList<GameCharacter> gameCharacterPlayers) throws InterruptedException {
+    public void combatTurn(ArrayList<GameCharacter> gameCharacterEnemies, ArrayList<GameCharacter> gameCharacterPlayers) throws InterruptedException, IOException {
 
         if (this instanceof Player || this instanceof NonPlayableCharacter) {
-
             String allyName = Settings.BLUE+getName()+Settings.TEXT_RESET;
             Scanner user_scanner = new Scanner(System.in);
             while (true) {
+                Combat.printCombatDetails();
                 System.out.println("What will " + allyName + " do?");
                 System.out.println("1. Attack");
                 System.out.println("2. Run away");
@@ -75,45 +77,62 @@ public abstract class GameCharacter {
 
                 String userInput = user_scanner.next();
 
-                if (userInput.contains("1")) {
+                Combat.printCombatDetails();
+
+                if (userInput.equals("1")) {
                     boolean validInput = false;
+                    System.out.println("Which enemy does "+allyName+" want to attack?");
+
                     do {
-                        System.out.println("Which enemy does "+allyName+" want to attack?");
                         try {
-                            int userWhichEnemy = user_scanner.nextInt();
-                            userWhichEnemy -= 1;
-                            if (userWhichEnemy >= 0 && userWhichEnemy <= gameCharacterEnemies.size()) {
+                            String userWhichEnemy = user_scanner.next();
+                            System.out.print("\033[A"+"\33[2K\r");
+                            int userWhichEnemyInt = Integer.parseInt(userWhichEnemy);
+
+                            userWhichEnemyInt -= 1;
+
+                            if (gameCharacterEnemies.get(userWhichEnemyInt).isCharacterDead) {
+                                System.out.print(gameCharacterEnemies.get(userWhichEnemyInt).getName()+
+                                        " is already dead! Don't desecrate a dead corpse!");
+                                Thread.sleep(500);
+                                System.out.print("\33[2K\r");
+                                user_scanner.nextLine();
+                            }
+
+                            else if (userWhichEnemyInt >= 0 && userWhichEnemyInt <= gameCharacterEnemies.size()) {
                                 validInput = true;
-                                attackCharacter(gameCharacterEnemies.get(userWhichEnemy));
-                                System.out.print("\33[2K");
+                                attackCharacter(gameCharacterEnemies.get(userWhichEnemyInt));
+                                System.out.print("\33[2K\r");
                                 System.out.println(allyName+" dealt "+getDamage()+
-                                        " towards the "+gameCharacterEnemies.get(userWhichEnemy).getName());
+                                        " towards the "+gameCharacterEnemies.get(userWhichEnemyInt).getName());
                                 Thread.sleep(500);
                             }
                             else {
                                 System.out.println("This isn't the number of any enemy!");
                                 Thread.sleep(500);
+                                System.out.print("\33[2K\r");
+                                user_scanner.nextLine();
                             }
 
                         } catch (Exception InputMismatchException) {
+                            //System.out.print("\033[A"+"\33[2K\r");
                             System.out.print("Input unrecognized! Enter the number of any enemy!");
                             Thread.sleep(850);
-                            System.out.print("\33[2K");
+                            System.out.print("\u001B[2K\r");
                             user_scanner.nextLine();
 
                         }
-
                     }
                     while (!validInput);
 
                     break;
                 }
-                else if (userInput.contains("2")) {
+                else if (userInput.equals("2")) {
                     System.out.println(allyName+" chose to run away!");
                     break;
                 }
-                else if (userInput.contains("3")) {
-                    //viewEnemyDetails = true;
+                else if (userInput.equals("3")) {
+                    Combat.setViewEnemyDetails(true);
                 }
                 else {
                     System.out.println("Unrecognized input, Try again!");
@@ -122,7 +141,6 @@ public abstract class GameCharacter {
             }
 
         }
-
 
         else if (this instanceof Enemy){
             int targetRandomInt = random.nextInt(gameCharacterPlayers.size());
