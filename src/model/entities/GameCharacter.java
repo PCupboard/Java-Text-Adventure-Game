@@ -17,7 +17,7 @@ public abstract class GameCharacter {
     // CHARACTER STATS VARIABLES
     private int maxHealth = 100;
     private int currentHealth = maxHealth;
-    private boolean characterDeadStatus = false;
+    private boolean isCharacterDead = false;
 
     private int maxConstitution = 10;
     private int currentConstitution = maxConstitution;
@@ -182,23 +182,18 @@ public abstract class GameCharacter {
     // Should the character be removed from the game if such a thing happens? hmmm
     public void addCurrentHealth(int CurrentHealth) {
         currentHealth += CurrentHealth;
-        characterDeadStatus = isCharacterDead();
+        isCharacterDead = isCharacterDead();
     }
 
     public void removeCurrentHealth(int CurrentHealth) {
         currentHealth -= CurrentHealth;
-        characterDeadStatus = isCharacterDead();
+        isCharacterDead = isCharacterDead();
     }
     private boolean isCharacterDead() {
-        if (getCurrentHealth() <= 0) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (getCurrentHealth() <= 0);
     }
-    public boolean getCharacterDeadStatus() {
-        return characterDeadStatus;
+    public boolean getIsCharacterDead() {
+        return isCharacterDead;
     }
 
     public String printHealth() {

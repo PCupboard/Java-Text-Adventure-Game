@@ -10,12 +10,6 @@ import util.Settings;
 import java.io.IOException;
 import java.util.*;
 
-
-//##########################################
-// Need to finish checking if all characters on one side are dead
-//##########################################
-
-
 public abstract class Combat {
     // Variables which need to be saved on exit from game (a.k.a need getters)
     private static int numBattles = 0;
@@ -23,16 +17,13 @@ public abstract class Combat {
     // Variables which need to be zeroed/cleared after each combat is done
     static boolean viewEnemyDetails = false;
     static boolean combatOngoing = true;
+    private static final ArrayList<GameCharacter> gameCharacterPlayers = new ArrayList<>();
+    private static final ArrayList<GameCharacter> gameCharacterEnemies = new ArrayList<>();
 
-    private static ArrayList<GameCharacter> charactersTurnList = new ArrayList<>();
+    // Variables that do not need zeroing/clearing after each combat
+    private static final ArrayList<GameCharacter> charactersTurnList = new ArrayList<>();
 
-    private static ArrayList<GameCharacter> gameCharacterPlayers = new ArrayList<>();
-    private static ArrayList<GameCharacter> gameCharacterEnemies = new ArrayList<>();
-
-    private static ArrayList<GameCharacter> deadGameCharacterPlayers = new ArrayList<>();
-    private static ArrayList<GameCharacter> deadGameCharacterEnemies = new ArrayList<>();
-
-    static Random random = new Random();
+    // <------------------------------------------------------------------------------------------->
 
     // Combat method
     public static void start(GameCharacter @NotNull... characters) throws IOException, InterruptedException {
@@ -55,9 +46,16 @@ public abstract class Combat {
             calculateTurnOrder();
 
             for (GameCharacter character : charactersTurnList) {
+
+                if (isOneSideDead()) {
+                    // The combat has ended, need to print out some sort of reward screen :D
+                    combatOngoing = false;
+                    break;
+                }
+
                 printCombatDetails();
 
-                if (!character.getCharacterDeadStatus()) {
+                if (!character.getIsCharacterDead()) {
                     character.characterCombatTurn(gameCharacterEnemies, gameCharacterPlayers);
                 }
             }
@@ -67,10 +65,10 @@ public abstract class Combat {
         }
         while (combatOngoing);
         restartBattleVariables();
+        // BATTLE LOOP ENDS HERE!
 
     }
 
-    // 2v2 method
     private static void commenceCombatPrint() throws InterruptedException {
 
         Thread.sleep(500);
@@ -99,7 +97,7 @@ public abstract class Combat {
         Settings.clearScreen();
         System.out.println(Settings.BLUE+"ALLIES"+Settings.TEXT_RESET);
         for (GameCharacter player : gameCharacterPlayers) {
-            if (player.getCharacterDeadStatus()) {
+            if (player.getIsCharacterDead()) {
                 System.out.println(player.getName() + Settings.RED+" DEAD "+Settings.TEXT_RESET+
                         player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
             }
@@ -149,28 +147,34 @@ public abstract class Combat {
         }
     }
 
-    private static boolean addDeadCharacters() {
+    private static boolean isOneSideDead() {
+        boolean oneSideDead = true;
+
         for (GameCharacter ally : gameCharacterPlayers) {
-            if (ally.getCharacterDeadStatus()) {
-                deadGameCharacterPlayers.add(ally);
+            if (!ally.getIsCharacterDead()) {
+                oneSideDead = false;
+                break;
             }
         }
 
+        if (oneSideDead) {
+            return true;
+        }
+
+        oneSideDead = true;
         for (GameCharacter enemy : gameCharacterEnemies) {
-            if (enemy.getCharacterDeadStatus()) {
-                deadGameCharacterEnemies.add(enemy);
+            if (!enemy.getIsCharacterDead()) {
+                oneSideDead = false;
+                break;
             }
         }
 
-        return deadGameCharacterEnemies == gameCharacterEnemies || deadGameCharacterPlayers == gameCharacterPlayers;
+        return oneSideDead;
     }
 
     private static void restartBattleVariables() {
         gameCharacterPlayers.clear();
         gameCharacterEnemies.clear();
-
-        deadGameCharacterEnemies.clear();
-        deadGameCharacterPlayers.clear();
 
         combatOngoing = true;
 

@@ -47,23 +47,6 @@ public abstract class Stats {
         }
     }
 
-    public String printHealth() {
-        StringBuilder healthBar = new StringBuilder();
-        healthBar.append("│");
-        int maxHealthForBar = maxHealth / 10;
-        int currentHealthForBar = currentHealth / 10;
-
-        for (int i = 1; i <= currentHealthForBar; i++) {
-            healthBar.append("\u001B[42m" + " " + Settings.TEXT_RESET);
-        }
-        for (int i = 1; i <= (maxHealthForBar - currentHealthForBar); i++) {
-            healthBar.append("\u001B[41m" + " " + Settings.TEXT_RESET);
-        }
-        healthBar.append("│");
-        return healthBar.toString();
-
-    }
-
     public int getMaxConstitution() {
         return maxConstitution;
     }

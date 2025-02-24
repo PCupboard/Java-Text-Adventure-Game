@@ -27,7 +27,7 @@ public class Main {
         Item potion = new Item("Healing Potion", "A healing potion crafted by the gods themselves", 1, Rarity.LEGENDARY);
         System.out.println(potion);
 
-        Weapon fist = new Weapon("Nothing", "You have nothing currently equipped!", 0, "", 5, true);
+        Weapon fist = new Weapon("Nothing", "You have nothing currently equipped!", 0, "", 20, true);
 
         Player player = new Player("Tadas", "The player character!", fist);
         NonPlayableCharacter npc1 = new NonPlayableCharacter("John", "An adventurer who set out after losing his hometown", fist);
