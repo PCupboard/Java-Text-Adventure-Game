@@ -41,7 +41,9 @@ public abstract class GameCharacter {
     which then gets added, subtracted, multiplied, or divided depending on the stat change?
     Should weapons at a certain rarity be able to have special abilities?
      */
+
     //private ArrayList<Storage> storage;
+
     /*
     The player needs some form of inventory how would this be achieved?
     The other entities do need current weapon, so they can get stronger with the player.
@@ -59,11 +61,17 @@ public abstract class GameCharacter {
         this.name = name;
         this.description = description;
         this.currentWeapon = currentWeapon;
+    }
+    public GameCharacter(String name, String description) {
+        //id++;
+        this.name = name;
+        this.description = description;
 
     }
 
 
     public void combatTurn(ArrayList<GameCharacter> gameCharacterEnemies, ArrayList<GameCharacter> gameCharacterPlayers) throws InterruptedException, IOException {
+        Scanner player_waiting = new Scanner(System.in);
 
         if (this instanceof Player || this instanceof NonPlayableCharacter) {
             String allyName = Settings.BLUE+getName()+Settings.TEXT_RESET;
@@ -79,7 +87,12 @@ public abstract class GameCharacter {
 
                 Combat.printCombatDetails();
 
-                if (userInput.equals("1")) {
+                // Kristoffer sin cheat kode ;) laget 07.03.2025 COPYRIGHTED CODE BY KRISTOFFER KIRKERØD
+                if (userInput.equals("krissErKul")){
+                    addCurrentHealth(maxHealth);
+                }
+
+                else if (userInput.equals("1")) {
                     boolean validInput = false;
                     System.out.println("Which enemy does "+allyName+" want to attack?");
 
@@ -99,7 +112,7 @@ public abstract class GameCharacter {
                                 user_scanner.nextLine();
                             }
 
-                            else if (userWhichEnemyInt >= 0 && userWhichEnemyInt <= gameCharacterEnemies.size()) {
+                            else if (userWhichEnemyInt >= 0) {
                                 validInput = true;
                                 attackCharacter(gameCharacterEnemies.get(userWhichEnemyInt));
                                 System.out.print("\33[2K\r");
@@ -107,45 +120,50 @@ public abstract class GameCharacter {
                                         " towards the "+gameCharacterEnemies.get(userWhichEnemyInt).getName());
                                 Thread.sleep(500);
                             }
-                            else {
-                                System.out.println("This isn't the number of any enemy!");
-                                Thread.sleep(500);
-                                System.out.print("\33[2K\r");
-                                user_scanner.nextLine();
-                            }
 
                         } catch (Exception InputMismatchException) {
-                            //System.out.print("\033[A"+"\33[2K\r");
                             System.out.print("Input unrecognized! Enter the number of any enemy!");
                             Thread.sleep(850);
                             System.out.print("\u001B[2K\r");
                             user_scanner.nextLine();
-
                         }
                     }
                     while (!validInput);
 
                     break;
                 }
+
                 else if (userInput.equals("2")) {
                     System.out.println(allyName+" chose to run away!");
                     break;
                 }
+
                 else if (userInput.equals("3")) {
                     Combat.setViewEnemyDetails(true);
                 }
+
                 else {
                     System.out.println("Unrecognized input, Try again!");
                     Thread.sleep(500);
                 }
             }
-
         }
 
-        else if (this instanceof Enemy){
+        else if (this instanceof Enemy) {
             int targetRandomInt = random.nextInt(gameCharacterPlayers.size());
             GameCharacter targetToAttack = gameCharacterPlayers.get(targetRandomInt);
             attackCharacter(targetToAttack);
+            Combat.printCombatDetails();
+            System.out.println(name+" attacks "+Settings.BLUE+targetToAttack.getName()+Settings.TEXT_RESET+" for "+Settings.YELLOW
+                               +getDamage()+Settings.TEXT_RESET+" Damage!");
+            Thread.sleep(750);
+
+            /*
+            if (player_waiting.nextLine().isEmpty()) {
+                return;
+            }
+
+             */
         }
     }
 
@@ -200,6 +218,9 @@ public abstract class GameCharacter {
     // Should the character be removed from the game if such a thing happens? hmmm
     public void addCurrentHealth(int CurrentHealth) {
         currentHealth += CurrentHealth;
+        if (currentHealth > maxHealth) {
+            currentHealth = maxHealth;
+        }
         isCharacterDead = isCharacterDead();
     }
 
@@ -228,8 +249,29 @@ public abstract class GameCharacter {
         }
         healthBar.append("│");
         return healthBar.toString();
-
     }
+    public String printHealth(int allyNameLength) {
+        StringBuilder healthBar = new StringBuilder();
+        int maxHealthForBar = maxHealth / 10;
+        int currentHealthForBar = currentHealth / 10;
+
+        for (int i=1; i <= allyNameLength - getName().length(); i++) {
+            healthBar.append(" ");
+            //System.out.print(" ");
+        }
+        healthBar.append("│");
+
+        for (int i = 1; i <= currentHealthForBar; i++) {
+            healthBar.append("\u001B[42m" + " " + Settings.TEXT_RESET);
+        }
+        for (int i = 1; i <= (maxHealthForBar - currentHealthForBar); i++) {
+            healthBar.append("\u001B[41m" + " " + Settings.TEXT_RESET);
+        }
+        healthBar.append("│");
+        return healthBar.toString();
+    }
+
+
 
     public int getMaxConstitution() {
         return maxConstitution;

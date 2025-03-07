@@ -7,6 +7,8 @@ public abstract class Settings {
         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
     }
 
+    public static final String GAME_NAME = "Synthaxe";
+
     public static final String MOVE_UP_ONE_LINE = "\033[A";
     public static final String REMOVE_TEXT_CURRENT_LINE = "\33[2K\r";
 

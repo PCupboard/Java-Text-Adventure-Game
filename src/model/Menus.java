@@ -28,4 +28,8 @@ public abstract class Menus {
                 System.out.println("Exit le game");
         }
     }
+
+    public void playerLocationMenu() {
+
+    }
 }

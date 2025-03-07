@@ -16,6 +16,9 @@ public abstract class Combat {
     // Variables which need to be zeroed/cleared after each combat is done
     static boolean viewEnemyDetails = false;
     static boolean combatOngoing = true;
+    static boolean isFirstTurn = true;
+    static int longestNameAllies = 0;
+    static int longestNameEnemies = 0;
     private static final ArrayList<GameCharacter> gameCharacterPlayers = new ArrayList<>();
     private static final ArrayList<GameCharacter> gameCharacterEnemies = new ArrayList<>();
 
@@ -31,9 +34,15 @@ public abstract class Combat {
         for (GameCharacter character : characters) {
             if (character instanceof Player || character instanceof NonPlayableCharacter) {
                 gameCharacterPlayers.add(character);
+                if (character.getName().length() > longestNameAllies) {
+                    longestNameAllies = character.getName().length();
+                }
             }
             else if (character instanceof Enemy) {
                 gameCharacterEnemies.add(character);
+                if (character.getName().length() > longestNameEnemies) {
+                    longestNameEnemies = character.getName().length();
+                }
             }
         }
 
@@ -63,6 +72,9 @@ public abstract class Combat {
         while (combatOngoing);
         restartBattleVariables();
         // BATTLE LOOP ENDS HERE!
+        printCombatDetails();
+
+        // Rewards screen:
 
     }
 
@@ -113,33 +125,26 @@ public abstract class Combat {
                         player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
             }
             else {
-                System.out.println(player.getName() + " " + player.printHealth() + " " +
+                System.out.println(player.getName() + " " + player.printHealth(longestNameAllies) + " " +
                         player.getCurrentHealth() + "/" + player.getMaxHealth() + " health\n");
             }
         }
 
-        // Need to redo the code for this once i add storage for enemies, need to show how many potions they have.
+        // Need to redo the code for this once i add storage or special abilities for enemies.
         int numEnemy = 1;
         System.out.println(Settings.RED+"ENEMIES"+Settings.TEXT_RESET);
         for (GameCharacter enemy : gameCharacterEnemies) {
 
-            System.out.println("┌─┐ ");
             if (enemy.getIsCharacterDead()) {
-                System.out.println("│"+numEnemy+"│ "+enemy.getName() + " " + Settings.RED + "DEAD" + Settings.TEXT_RESET +
-                        " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
+                System.out.println(enemy.getName() + Settings.RED+" DEAD "+Settings.TEXT_RESET+
+                        enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health\n");
             }
             else {
-                System.out.println("│"+numEnemy+"│ "+enemy.getName() + " " + enemy.printHealth() +
-                        " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health");
-            }
-
-            if (viewEnemyDetails) {
-                System.out.print("└─┘ ");
-                System.out.println("Equipped weapon: " + enemy.getCurrentWeapon().getNameWithRarity() + " | " + enemy.getCurrentWeapon().getDamage() + " damage");
-            } else {
-                System.out.println("└─┘ ");
+                System.out.println("│"+numEnemy+"│ "+ enemy.getName()+ " " + enemy.printHealth(longestNameEnemies) +
+                        " " + enemy.getCurrentHealth() + "/" + enemy.getMaxHealth() + " health\n");
             }
             numEnemy++;
+
         }
         viewEnemyDetails = false;
 
@@ -147,6 +152,11 @@ public abstract class Combat {
             System.out.print("─");
         }
         System.out.println();
+
+    }
+
+    private static void afterCombatRewardScreen() throws IOException, InterruptedException {
+        printCombatDetails();
 
     }
 
@@ -199,6 +209,9 @@ public abstract class Combat {
         gameCharacterEnemies.clear();
 
         combatOngoing = true;
+        isFirstTurn = true;
+        longestNameAllies = 0;
+        longestNameEnemies = 0;
 
     }
 
